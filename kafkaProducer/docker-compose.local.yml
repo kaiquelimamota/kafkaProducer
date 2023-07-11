@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+# databases
+  Postgresql-db:
+    image: postgres:14.1-alpine
+    container_name: Postgresql-db
+    restart: always
+    environment:
+      - POSTGRES_DB=db_User
+      - POSTGRES_USER=userMaster
+      - POSTGRES_PASSWORD=chave
+      - TZ=America/Sao_Paulo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./infra/postgres/db_User/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - .docker/Postgresql-db:/var/lib/postgresql/data
+    extra_hosts:
+      - "host.docker.internal:172.19.0.1"
+    networks:
+      - kafka_net
+volumes:
+  db:
+    driver: local
+  #zookeeper:
+  #  image: wurstmeister/zookeeper
+  #  container_name: zookeeper
+  #  ports:
+  #    - "2181:2181"
+  #  networks:
+  #    - kafka_net
+  #kafka:
+  #  image: wurstmeister/kafka
+  #  depends_on:
+  #    - zookeeper
+  #  restart: on-failure
+  #  container_name: kafka
+  #  ports:
+  #    - "9092:9092"
+  #  environment:
+  #    KAFKA_ADVERTISED_HOST_NAME: localhost
+  #    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #  networks:
+  #    - kafka_net
+networks:
+  kafka_net:
+    driver: "bridge"
